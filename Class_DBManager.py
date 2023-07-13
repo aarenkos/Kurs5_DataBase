@@ -4,7 +4,7 @@ from utils import get_query
 
 
 class DBManager:
-
+    """Класс для работы с данными в БД. """
     def __init__(self, host, database, user, password, port):
         self.host = host
         self.database = database
@@ -12,8 +12,8 @@ class DBManager:
         self.password = password
         self.port = port
 
-
     def connect_bd(self, name_bd):
+        """Метод для подключения к базе данных"""
         conn = psycopg2.connect(
             host=self.host,
             database=name_bd,
@@ -22,7 +22,9 @@ class DBManager:
             port=self.port
         )
         return conn
+
     def create_database(self, name):
+        """Метод для создания базы данных"""
         connect_bd = self.connect_bd("postgres")
         connect_bd.autocommit = True
         curs = connect_bd.cursor()
@@ -39,15 +41,13 @@ class DBManager:
         connect_bd.close()
 
     def create_tables(self):
-
+        """Метод для создания таблиц в базе данных"""
         create_tables_employers = get_query('--create_tables_employers')
         create_tables_vacancies = get_query('--create_tables_vacancies')
 
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
         cur = connect_bd.cursor()
-
-
         cur.execute(create_tables_employers)
         cur.execute(create_tables_vacancies)
         connect_bd.commit()
@@ -56,7 +56,7 @@ class DBManager:
         connect_bd.close()
 
     def drop_database(self, name):
-
+        """Метод для удаления базы данных при необходимости"""
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
         cur = connect_bd.cursor()
@@ -70,7 +70,7 @@ class DBManager:
         connect_bd.close()
 
     def get_companies_and_vacancies_count(self):
-
+        """Метод для получения списка всех компаний и количества вакансий у каждой компании."""
         companies_and_vacancies_count = get_query('--get_companies_and_vacancies_count')
 
         connect_bd = self.connect_bd("hh")
@@ -88,7 +88,7 @@ class DBManager:
         connect_bd.close()
 
     def save_employers_to_db(self, data):
-
+        """ Метод для сохранения списка компаний в БД"""
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
         cur = connect_bd.cursor()
@@ -102,7 +102,7 @@ class DBManager:
         connect_bd.close()
 
     def save_vacancies_to_db(self, data):
-
+        """Метод для сохранения списка вакансий в БД"""
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
         cur = connect_bd.cursor()
@@ -115,13 +115,17 @@ class DBManager:
         connect_bd.close()
 
     def get_all_vacancies(self):
+        """Метод получает список всех вакансий с указанием названия компании,
+         названия вакансии и зарплаты и ссылки на вакансию"""
         get_vacancies = get_query('--get_all_vacancies')
         connect_bd = self.connect_bd("hh")
+
         connect_bd.autocommit = True
         cur = connect_bd.cursor()
         cur.execute(get_vacancies)
+
         results = cur.fetchall()
-        for name, employer, salary,employer_id, url in results:
+        for name, employer, salary, employer_id, url in results:
             print(f"Company: {employer}, vacancy: {name}, salary: {salary}, link: {url}")
 
         connect_bd.commit()
@@ -129,7 +133,7 @@ class DBManager:
         connect_bd.close()
 
     def get_avg_salary(self):
-
+        """Метод получает среднюю зарплату по вакансиям"""
         query_avg_salary = get_query('avg_salary')
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
@@ -145,7 +149,7 @@ class DBManager:
         return avg_salary
 
     def get_vacancies_with_higher_salary(self, avg_salary):
-
+        """Метод получает список всех вакансий, у которых зарплата выше средней по всем вакансиям"""
         query_vacancies_with_higher_salary = get_query('--get_vacancies_with_higher_salary')
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
@@ -161,15 +165,16 @@ class DBManager:
         connect_bd.close()
 
     def get_vacancies_with_keyword(self, keyword: str):
+        """Метод получает  список всех вакансий, в названии которых содержатся
+         переданные в метод слова, например “python”"""
         query_vacancies_with_keyword = get_query('--get_vacancies_with_keyword')
-
         connect_bd = self.connect_bd("hh")
         connect_bd.autocommit = True
         cur = connect_bd.cursor()
 
         cur.execute(query_vacancies_with_keyword, ('%' + keyword + '%',))
         results = cur.fetchall()
-        for name, employer, salary,employer_id, url in results:
+        for name, employer, salary, employer_id, url in results:
             print(f"Company: {employer}, vacancy: {name}, salary: {salary}, link: {url}")
 
         connect_bd.commit()

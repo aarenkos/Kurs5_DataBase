@@ -2,6 +2,8 @@ import requests
 
 
 def get_employers_hh(employers_id):
+    """Функция получает по API с HeadHunter данные о работодателях, список работодателей задается
+    аргументом employers_id , получаем список, в котором Наименованией работодателей соответствует id c c HH.ru"""
     employers_data = []
     employers = []
 
@@ -14,17 +16,17 @@ def get_employers_hh(employers_id):
         data_employers = response.json()
         employers_data.append(data_employers)
 
-        # print(employers_data)
-
     for i in employers_data:
         id_employer = i["id"]
         name = i['name']
-
         employers.append([id_employer, name])
     return employers
 
 
 def get_vacancies_hh(employers_id):
+    """Функция получает по API с HeadHunter данные о вакансиях определенных работодателей, список работодателей задается
+    аргументом employers_id , получаем список, в котором : Название вакансии(vacancy_name), Работодатель(employer),
+     Зарплата(salary), id работодателя(employer_id), Ссылка на вакансию(vacancy_url)"""
     vacancies_url = f"https://api.hh.ru/vacancies"
     headers = {"User-Agent": "ParserEmployersVacancyAR (a.a.renkos@gmail.com)"}
     vacancies_hh = []
@@ -36,7 +38,7 @@ def get_vacancies_hh(employers_id):
         }
         response = requests.get(vacancies_url, headers=headers, params=params)
         vacancies_data = response.json()
-        # print(vacancies_data)
+
         for vacancy in vacancies_data.get('items'):
             vacancy_name = vacancy['name']
             employer = vacancy['employer']['name']
@@ -51,6 +53,7 @@ def get_vacancies_hh(employers_id):
 
 
 def get_query(query_type):
+    """Функция для определения необходимого запроса к БД. Находит необходимый запрос и возвращает его"""
     with open('queries.sql') as f:
         label = False
         for line in f:
