@@ -48,3 +48,15 @@ def get_vacancies_hh(employers_id):
             vacancy_url = vacancy['url']
             vacancies_hh.append([vacancy_name, employer, salary, employer_id, vacancy_url])
     return vacancies_hh
+
+
+def get_query(query_type):
+    with open('queries.sql') as f:
+        label = False
+        for line in f:
+            if label:
+                query = line
+                break
+            elif query_type in line:
+                label = True
+    return query
